@@ -1,0 +1,29 @@
+footer {
+  background-color: rgb(0 0 0);
+  color: white;
+  padding: 5px 0;
+  text-align: center;
+
+  /* Fijamos el footer en la parte inferior */
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  z-index: 1000; /* Asegura que el footer esté encima de otros elementos */
+}
+
+footer .fab {
+  font-size: 1.5rem; /* Mantener el tamaño de los íconos */
+  transition: color 0.3s ease;
+}
+
+footer img {
+  width: 30px; /* Reducir el tamaño de las imágenes */
+  height: 30px;
+  border-radius: 10px;
+  transition: transform 0.3s ease;
+  margin: 0 5px; /* Ajustar espacio entre las imágenes */
+}
+
+footer img:hover {
+  transform: scale(1.5); /* Reducir el efecto de escala en hover */
+}
