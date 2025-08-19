@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { ClienteRequest } from '../../models/cliente.request.model';
 import { ClientesService } from '../../service/clientes.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ClienteResponse } from '../../models/Cliente.response.model';
+import { ClienteResponse } from '../../models/cliente.response.model';
 import Swal from 'sweetalert2';
 import { AuthService } from '../../service/auth.service';
 
