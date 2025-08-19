@@ -1,14 +1,9 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule, provideClientHydration, withEventReplay } from '@angular/platform-browser';
 
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { ComponentesComponent } from './componentes/componentes.component';
-import { EnvironmentsComponent } from './environments/environments.component';
-import { GuardsComponent } from './guards/guards.component';
-import { ModelsComponent } from './models/models.component';
-import { SharedComponent } from './shared/shared.component';
-import { ServiceComponent } from './service/service.component';
 import { UsuariosComponent } from './componentes/usuarios/usuarios.component';
 import { ClienteComponent } from './componentes/cliente/cliente.component';
 import { ProductosComponent } from './componentes/productos/productos.component';
@@ -17,16 +12,13 @@ import { DashboardComponent } from './componentes/dashboard/dashboard.component'
 import { PedidosComponent } from './componentes/pedidos/pedidos.component';
 import { NavbarComponent } from './componentes/common/navbar/navbar.component';
 import { FooterComponent } from './componentes/common/footer/footer.component';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { AuthInterceptor } from './shared/auth.interceptor';
+import { ErrorInterceptor } from './shared/error.interceptor';
 
 @NgModule({
   declarations: [
     AppComponent,
-    ComponentesComponent,
-    EnvironmentsComponent,
-    GuardsComponent,
-    ModelsComponent,
-    SharedComponent,
-    ServiceComponent,
     UsuariosComponent,
     ClienteComponent,
     ProductosComponent,
@@ -38,10 +30,13 @@ import { FooterComponent } from './componentes/common/footer/footer.component';
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    FormsModule,
+    HttpClientModule
   ],
   providers: [
-    provideClientHydration(withEventReplay())
+    {provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi:true},
+    {provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi:true},
   ],
   bootstrap: [AppComponent]
 })

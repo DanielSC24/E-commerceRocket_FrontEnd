@@ -1,0 +1,23 @@
+footer {
+  background-color: #000000;
+  color: white;
+  padding: 5px 0; /* Reducir padding vertical sin afectar el texto */
+  text-align: center;
+}
+
+footer .fab {
+  font-size: 1.5rem; /* Mantener el tamaño de los íconos */
+  transition: color 0.3s ease;
+}
+
+footer img {
+  width: 30px; /* Reducir el tamaño de las imágenes */
+  height: 30px;
+  border-radius: 10px;
+  transition: transform 0.3s ease;
+  margin: 0 5px; /* Ajustar espacio entre las imágenes */
+}
+
+footer img:hover {
+  transform: scale(1.5); /* Reducir el efecto de escala en hover */
+}
