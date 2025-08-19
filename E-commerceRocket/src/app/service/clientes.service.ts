@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../environments/enviroments';
 import { Observable, throwError, catchError, map, of } from 'rxjs';
 import { ClienteRequest } from '../models/cliente.request.model';
-import { ClienteResponse } from '../models/Cliente.response.model';
+import { ClienteResponse } from '../models/cliente.response.model';
 
 @Injectable({
   providedIn: 'root'
