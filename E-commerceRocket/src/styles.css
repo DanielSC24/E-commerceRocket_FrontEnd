@@ -1,1 +1,16 @@
-/* You can add global styles to this file, and also import other style files */
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+/* El contenedor principal ocupa todo el espacio disponible */
+.app-container {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 50px; /* Espacio suficiente para no solapar con el footer */
+}
+
+main {
+  flex-grow: 1;
+}/* You can add global styles to this file, and also import other style files */

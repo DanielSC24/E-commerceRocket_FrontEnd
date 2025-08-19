@@ -32,6 +32,7 @@ import { ErrorInterceptor } from './shared/error.interceptor';
     BrowserModule,
     AppRoutingModule,
     FormsModule,
+    ReactiveFormsModule,
     HttpClientModule
   ],
   providers: [
