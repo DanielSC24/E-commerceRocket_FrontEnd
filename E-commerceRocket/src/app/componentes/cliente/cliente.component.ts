@@ -23,7 +23,11 @@ export class ClienteComponent {
   isEditMode: boolean = false;
   mostrarAcciones: boolean = false;
 
-  constructor(private clientesService: ClientesService, private fb: FormBuilder) {
+  constructor(
+    private clientesService: ClientesService,
+    private fb: FormBuilder,
+    private authService: AuthService
+  ) {
     this.clienteForm = this.fb.group({
       id: [null],
       nombre: ['', [Validators.required, Validators.maxLength(30)]],
@@ -32,15 +36,25 @@ export class ClienteComponent {
       telefono: ['', [Validators.required, Validators.maxLength(15)]],
       direccion: ['', [Validators.required, Validators.maxLength(100)]]
     });
+
   }
-ngOnInit(){
+  resetForm(): void {
+    this.clienteForm.reset();
+    this.showForm = false;
+    this.isEditMode = false;
+    this.selectedCliente = null;
+    this.textoModal = 'Nuevo Cliente';
+  }
+  
+  ngOnInit(){
   this.listarClientes();
-  if(this.authservice.hasRole(RadioNodeList.ADMIN)) {
-    this.mostrarAcciones = true;
-  }
+  // Replace 'ADMIN_ROLE' with the actual value or enum used in your app for the admin role
+    if(this.authService.hasRole('ADMIN')) {
+      this.mostrarAcciones = true;
+    }
 }
 listarClientes(): void{
-  this.clientesService.getClientes().suscribe({
+  this.clientesService.getClientes().subscribe({
     next: resp => {
       this.clientes = resp;
     }
