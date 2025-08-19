@@ -1,7 +1,7 @@
 export interface PedidoResponse{
   id: number,
-  idCliente: number,
-  listaProductos: number,
+  cliente: string,
+  listarProductos: number,
   total: number,
   fechaCreacion: Date,
   estado: string,

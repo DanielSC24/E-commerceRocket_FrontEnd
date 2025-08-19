@@ -34,8 +34,6 @@ export class ProductosComponent {
 
   ngOnInit() {
     this.listarProductos();
-    // this.listarProveedores();
-    // this.listarCategorias();
     // if (this.authService.hasRole(Roles.ADMIN)) {
     //   this.muestraAcciones = true;
     // }
@@ -48,22 +46,6 @@ export class ProductosComponent {
       }
      });
     }
-
-  // listarProveedores(): void {
-  //   this.proveedoresService.getProveedores().subscribe({
-  //     next: resp => {
-  //       this.proveedores = resp;
-  //     }
-  //   });
-  // }
-
-  // listarCategorias(): void {
-  //   this.categoriaService.getCategorias().subscribe({
-  //     next: resp => {
-  //       this.categorias = resp;
-  //     }
-  //   });
-  // }
 
   toggleForm(): void {
     this.showForm = !this.showForm;
@@ -84,8 +66,6 @@ export class ProductosComponent {
   onSubmit(): void {
     if (this.productoForm.valid) {
       const productoData: ProductoRequest = this.productoForm.value;
-      // productoData.idCategoria = this.productoForm.value.categoria;
-      // productoData.idProveedores = this.productoForm.value.proveedores;
       console.log(productoData);
       if (this.isEditMode) {
         this.productosService.putProducto(productoData, productoData.id).subscribe({
@@ -129,10 +109,6 @@ export class ProductosComponent {
       descripcion: producto.descripcion,
       precio: producto.precio,
       stock: producto.stock
-      //categoria: this.categorias.find(c => c.nombre === producto.categoria)?.id,
-      //proveedores: this.proveedores
-        //.filter(p => producto.proveedores.includes(p.nombre))
-      //  .map(p => p.id)
     });
   }
 

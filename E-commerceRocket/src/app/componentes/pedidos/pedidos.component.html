@@ -1,0 +1,69 @@
+<div class="container-fluid mt-4" style="width: 95%;">
+  <h2>Productos</h2>
+  <div class="d-flex justify-content-between mb-3">
+    <button (click)="toggleForm()" class="btn btn-success">
+      <i class="fa-solid fa-plus"></i>
+      Registrar Producto
+    </button>
+  </div>
+
+  <table class="table table-striped table-bordered mt-3">
+    <thead class="table-dark">
+      <tr style="text-align: center;">
+        <th scope="col">#</th>
+        <th scope="col">Cliente</th>
+        <th scope="col">Listar Productos</th>
+        <th scope="col">Total</th>
+        <th scope="col">Fecha Creación</th>
+        <th scope="col">Estado</th>
+        <th scope="col" *ngIf="muestraAcciones">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let pedido of pedidos; let i = index" style="text-align: center; vertical-align: middle;">
+        <td>{{ i + 1 }}</td>
+        <td hidden>{{ pedido.id }}</td>
+        <td>{{ pedido.cliente }}</td>
+        <td>{{ pedido.listarProductos | currency }}</td>
+        <td>{{ pedido.total }}</td>
+        <td>{{ pedido.fechaCreacion }}</td>
+        <td>{{ pedido.estado }}</td>
+        <td *ngIf="muestraAcciones">
+          <button class="btn btn-primary btn-sm me-1" (click)="editProducto(pedido)">
+            <i class="fa fa-edit"></i> Editar
+          </button>
+          <button class="btn btn-danger btn-sm ms-1" (click)="deleteProducto(pedido.id)">
+            <i class="fa fa-trash"></i> Eliminar
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="showForm" style="margin-top: 20px;">
+    <h3>{{ textoModal }}</h3>
+    <form [formGroup]="pedidoForm" (ngSubmit)="onSubmit()">
+      <input type="hidden" readonly formControlName="id">
+
+      <div class="form-group">
+        <label for="nombre">Nombre</label>
+        <input id="nombre" class="form-control" formControlName="nombre" maxlength="30">
+      </div>
+      <div class="form-group">
+        <label for="descripcion">Descripción</label>
+        <input id="descripcion" class="form-control" formControlName="descripcion" maxlength="50">
+      </div>
+      <div class="form-group">
+        <label for="precio">Precio</label>
+        <input id="precio" type="number" class="form-control" formControlName="precio" min="1">
+      </div>
+      <div class="form-group">
+        <label for="stock">Stock</label>
+        <input id="stock" type="number" class="form-control" formControlName="stock" min="1">
+      </div>
+      <button type="submit" class="btn btn-success" [disabled]="pedidoForm.invalid" style="margin-top: 20px;">
+        Guardar
+      </button>
+    </form>
+  </div>
+</div>
