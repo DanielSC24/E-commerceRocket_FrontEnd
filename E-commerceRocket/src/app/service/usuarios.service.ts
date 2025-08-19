@@ -11,7 +11,7 @@ import { environment } from '../environments/enviroments';
 })
 export class UsuariosService {
 
-  private apiUrl: string = environment.apiUsers;
+  private apiUrl: string = environment.apiUrl;
 
   constructor(private http: HttpClient) { }
 

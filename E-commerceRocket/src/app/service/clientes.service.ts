@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../environments/enviroments';
 import { Observable, throwError, catchError, map, of } from 'rxjs';
-import { ClienteResponse } from '../models/Cliente.response.model';
 import { ClienteRequest } from '../models/cliente.request.model';
+import { ClienteResponse } from '../models/Cliente.response.model';
 
 @Injectable({
   providedIn: 'root'
