@@ -38,6 +38,7 @@ export class ClienteComponent {
     });
 
   }
+  //se ejecuta al inicializar el componente
   resetForm(): void {
     this.clienteForm.reset();
     this.showForm = false;
@@ -45,7 +46,7 @@ export class ClienteComponent {
     this.selectedCliente = null;
     this.textoModal = 'Nuevo Cliente';
   }
-  
+  //inicializa el componente
   ngOnInit(){
   this.listarClientes();
   // Replace 'ADMIN_ROLE' with the actual value or enum used in your app for the admin role
@@ -53,6 +54,7 @@ export class ClienteComponent {
       this.mostrarAcciones = true;
     }
 }
+//lista de clientes
 listarClientes(): void{
   this.clientesService.getClientes().subscribe({
     next: resp => {
@@ -60,6 +62,7 @@ listarClientes(): void{
     }
   });
 }
+//se ejecuta al alternar el formulario
 toggleForm(): void {
   this.showForm = !this.showForm;
   this.textoModal = 'Nuevo Cliente';
@@ -67,11 +70,12 @@ toggleForm(): void {
   this.clienteForm.reset();
   this.selectedCliente = null;
 }
-  
+  //actualiza o crea un cliente
 onSubmit(): void {
   if (this.clienteForm.valid){
     const clienteData = this.clienteForm.value;
     if (this.isEditMode){
+      // Actualiza un cliente existente
       this.clientesService.putCliente(clienteData, clienteData.id).subscribe({
         next: updateCliente => {
           const index = this.clientes.findIndex(c => c.id === updateCliente.id);
@@ -87,6 +91,7 @@ onSubmit(): void {
         }
       });
     }else{
+      // Crea un nuevo cliente
       this.clientesService.postCliente(clienteData).subscribe({
         next: newCliente => {
           this.clientes.push(newCliente);
@@ -101,7 +106,7 @@ onSubmit(): void {
     }
   }
 }
-
+//Edita un cliente
 editCliente(cliente: ClienteResponse): void {
   this.showForm = true;
   this.textoModal = 'Editando Cliente' + cliente.nombre;
@@ -112,6 +117,7 @@ editCliente(cliente: ClienteResponse): void {
   })
 }
 
+//elimina un cliente
 deleteCliente(idCliente: number): void {
   Swal.fire({
     title: '¿Estás seguro que deseas eliminar el cliente',
@@ -119,6 +125,7 @@ deleteCliente(idCliente: number): void {
     icon: 'question',
     showConfirmButton: true,
     showCancelButton: true
+    //se confirma la eliminacion
   }).then(resp => {
     if (resp.isConfirmed){
       this.clientesService.deleteCliente(idCliente).subscribe({
