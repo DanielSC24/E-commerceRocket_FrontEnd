@@ -4,6 +4,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PedidosService } from '../../service/pedidos.service';
 import Swal from 'sweetalert2';
 import { PedidoRequest } from '../../models/pedido.request.model';
+import { ClienteResponse } from '../../models/cliente.response.model';
+import { ClientesService } from '../../service/clientes.service';
 
 @Component({
   selector: 'app-pedidos',
@@ -14,6 +16,7 @@ import { PedidoRequest } from '../../models/pedido.request.model';
 export class PedidosComponent {
 
   pedidos: PedidoResponse[]=[];
+  clientes: ClienteResponse[]=[];
   showForm: boolean = false;
   pedidoForm: FormGroup;
   textoModal: string = 'Nuevos pedidos';
@@ -21,10 +24,10 @@ export class PedidosComponent {
   isEditMode: boolean = false;
   muestraAcciones: boolean = false;
 
-  constructor(private pedidosService: PedidosService, private formBuilder: FormBuilder){
+  constructor(private pedidosService: PedidosService, private clientesService: ClientesService,private formBuilder: FormBuilder){
     this.pedidoForm = this.formBuilder.group({
       id: [null],
-      cliente: ['', [Validators.required, Validators.maxLength(30)]],
+      cliente: ['', [Validators.required]],
       listarProductos:['', [Validators.required, Validators.min(0)]],
       total: ['',[Validators.required, Validators.min(0)]],
       fechaCreacion:['', [Validators.required, Validators.pattern(/^\d{4}-\d{2}-\d{2}$/)]],
@@ -34,6 +37,7 @@ export class PedidosComponent {
 
   ngOnInit(){
     this.listarPedidos();
+    this.listarClientes();
     // if (this.authService.hasRole(Roles.ADMIN)) {
     //   this.muestraAcciones = true;
     // }
@@ -43,6 +47,14 @@ export class PedidosComponent {
     this.pedidosService.getPedido().subscribe({
       next: resp => {
          this.pedidos = resp;
+      }
+    });
+  }
+
+  listarClientes(): void{
+    this.clientesService.getClientes().subscribe({
+      next: resp => {
+        this.clientes = resp;
       }
     });
   }
@@ -87,8 +99,8 @@ export class PedidosComponent {
             next: newProducto => {
               this.pedidos.push(newProducto);
               Swal.fire({
-                title: 'Producto registrado',
-                text: 'El producto fue registrado correctamente.',
+                title: 'Pedido registrado',
+                text: 'El pedido fue registrado correctamente.',
                 icon: 'success'
               });
               this.resetForm();
@@ -115,8 +127,8 @@ export class PedidosComponent {
 
     deleteProducto(idPedido: number): void {
       Swal.fire({
-        title: '¿Estás seguro que deseas eliminar el producto?',
-        text: 'Eliminar producto',
+        title: '¿Estás seguro que deseas eliminar el pedido?',
+        text: 'Eliminar pedido',
         icon: 'question',
         showConfirmButton: true,
         showCancelButton: true
