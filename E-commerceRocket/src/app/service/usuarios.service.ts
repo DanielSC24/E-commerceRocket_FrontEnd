@@ -1,9 +1,12 @@
+
+
 import { Injectable } from '@angular/core';
 import { catchError, Observable, throwError, map, of, } from 'rxjs';
 import { UsuarioResponse } from '../models/usuario.response.model';
 import { HttpClient } from '@angular/common/http';
 import { UsuarioRequest } from '../models/usuario.request.model';
 import { environment } from '../environments/enviroments';
+
 
 
 @Injectable({
@@ -14,6 +17,15 @@ export class UsuariosService {
   private apiUrl: string = environment.apiUrl;
 
   constructor(private http: HttpClient) { }
+
+  getRoles(): Observable<string[]> {
+    return this.http.get<string[]>(`${this.apiUrl}/roles`).pipe(
+      catchError(error => {
+        console.error('Error al obtener los roles', error);
+        return of([]);
+      })
+    );
+  }
 
   getUsuarios(): Observable<UsuarioResponse[]> {
     return this.http.get<UsuarioResponse[]>(this.apiUrl).pipe(

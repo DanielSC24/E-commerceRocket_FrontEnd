@@ -17,12 +17,12 @@ export class LoginComponent {
 
   onLogin(){
     this.error=''; //limpiar errores previos
-    /*this.authService.login(this.username, this.password).subscribe({
+    this.authService.login(this.username, this.password).subscribe({
       next: () => this.router.navigate(['/dashboard']),
       error: () =>{
         this.error = 'Credenciales inválidas';
       }
-    });*/
+    });
 
   }
 

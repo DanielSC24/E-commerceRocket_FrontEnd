@@ -52,6 +52,7 @@ export class AuthService {
   setToken(token:string): void{
     if(isPlatformBrowser(this.platformId)){
       localStorage.setItem(this.tokenKey, token);
+      this.payload = null; // Forzar recarga del payload en el próximo getRoles
     }
   }
 

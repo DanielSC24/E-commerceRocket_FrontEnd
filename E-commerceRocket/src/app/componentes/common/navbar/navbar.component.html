@@ -15,7 +15,7 @@
                 <li class="nav-item">
                     <a class="nav-link" routerLink="/dashboard/clientes" routerLinkActive="active">Clientes</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" *ngIf="isAdmin">
                     <a class="nav-link" routerLink="/dashboard/usuarios" routerLinkActive="active">Usuarios</a>
                 </li>
             </ul>

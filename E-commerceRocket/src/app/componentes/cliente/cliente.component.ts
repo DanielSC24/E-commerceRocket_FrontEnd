@@ -32,9 +32,12 @@ export class ClienteComponent {
       id: [null],
       nombre: ['', [Validators.required, Validators.maxLength(30)]],
       apellido: ['', [Validators.required, Validators.maxLength(30)]],
-      email: ['', [Validators.required, Validators.email]],
+      email: ['', [
+        Validators.required,
+        Validators.email
+      ]],
       telefono: ['', [Validators.required, Validators.maxLength(15)]],
-      direccion: ['', [Validators.required, Validators.maxLength(100)]]
+      direccion: ['', [ Validators.maxLength(100)]]
     });
 
   }

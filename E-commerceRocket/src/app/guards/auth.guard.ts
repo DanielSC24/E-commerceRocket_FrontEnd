@@ -9,12 +9,14 @@ export class AuthGuard implements CanActivate{
   constructor(private authService: AuthService, private router: Router){}
 
   canActivate(route: ActivatedRouteSnapshot, state:RouterStateSnapshot): boolean {
-    if(this.authService.isLoggedIn()){
-    
-    this.router.navigate(['/login']);
-    return false;
+ if(!this.authService.isLoggedIn()){
+  this.router.navigate(['/login']);
+  return false;
+}
+  
+ 
 
-  }
+
   const expectedRoles: string[] = route.data['roles'];
   if(expectedRoles && !this.authService.hasAnyRole(expectedRoles)){
     Swal.fire('Acceso denegado',
