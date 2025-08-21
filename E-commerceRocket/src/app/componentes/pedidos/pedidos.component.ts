@@ -6,6 +6,10 @@ import Swal from 'sweetalert2';
 import { PedidoRequest } from '../../models/pedido.request.model';
 import { ClienteResponse } from '../../models/cliente.response.model';
 import { ClientesService } from '../../service/clientes.service';
+import { ProductoResponse } from '../../models/producto.response.model';
+import { ProductosService } from '../../service/productos.service';
+import { AuthService } from '../../service/auth.service';
+import { Roles } from '../../constants/constants';
 
 @Component({
   selector: 'app-pedidos',
@@ -17,30 +21,37 @@ export class PedidosComponent {
 
   pedidos: PedidoResponse[]=[];
   clientes: ClienteResponse[]=[];
+  productosIds: ProductoResponse[]=[];
+  productosSeleccionados: ProductoResponse[] = [];
+  productosDisponibles: ProductoResponse[] = [];
   showForm: boolean = false;
   pedidoForm: FormGroup;
   textoModal: string = 'Nuevos pedidos';
   selectedPedido: PedidoResponse | null = null;
   isEditMode: boolean = false;
   muestraAcciones: boolean = false;
+  estadosPedido: string[] = ['PENDIENTE', 'ENVIADO', 'ENTREGADO', 'CANCELADO', 'PROCESANDO'];
 
-  constructor(private pedidosService: PedidosService, private clientesService: ClientesService,private formBuilder: FormBuilder){
+  constructor(private pedidosService: PedidosService, private clientesService: ClientesService,private authService: AuthService,
+    private productosService: ProductosService, private formBuilder: FormBuilder){
     this.pedidoForm = this.formBuilder.group({
       id: [null],
-      cliente: ['', [Validators.required]],
+      cliente: ['', [Validators.required]], //array del cliente por id
       listarProductos:['', [Validators.required, Validators.min(0)]],
+      productos:[[], [Validators.required]], // array de productos de id
       total: ['',[Validators.required, Validators.min(0)]],
-      fechaCreacion:['', [Validators.required, Validators.pattern(/^\d{4}-\d{2}-\d{2}$/)]],
-      estado:['', [Validators.required, Validators.maxLength(15)]],
+      fechaCreacion:[new Date().toISOString().split('T')[0]],
+      estado:['PENDIENTE', [Validators.required]],
     });
   }
 
   ngOnInit(){
     this.listarPedidos();
     this.listarClientes();
-    // if (this.authService.hasRole(Roles.ADMIN)) {
-    //   this.muestraAcciones = true;
-    // }
+    this.listarProductos();
+     if (this.authService.hasRole(Roles.ADMIN)) {
+       this.muestraAcciones = true;
+     }
   }
 
   listarPedidos(): void{
@@ -56,6 +67,15 @@ export class PedidosComponent {
       next: resp => {
         this.clientes = resp;
       }
+    });
+  }
+
+  listarProductos(): void{
+    this.productosService.getProductos().subscribe({
+      next: resp => {
+        this.productosIds = resp;
+      }
+
     });
   }
 
@@ -77,10 +97,21 @@ export class PedidosComponent {
 
   onSubmit(): void {
       if (this.pedidoForm.valid) {
-        const pedidoData: PedidoRequest = this.pedidoForm.value;
+        const formValue = this.pedidoForm.value;
+
+        const pedidoData: PedidoRequest = {
+          id: formValue.id,
+          clienteId: formValue.clienteId,
+          productosIds: formValue.productosIds,
+          total: formValue.total,
+          fechaCreacion: formValue.fechaCreacion,
+          estado: formValue.estado
+        };
+
+
         console.log(pedidoData);
         if (this.isEditMode) {
-          this.pedidosService.putPedido(pedidoData, pedidoData.id).subscribe({
+          this.pedidosService.putPedido(pedidoData, pedidoData.id!).subscribe({
             next: updatePedido => {
               const index = this.pedidos.findIndex(p => p.id === updatePedido.id);
               if (index !== -1) {
@@ -115,13 +146,38 @@ export class PedidosComponent {
       this.textoModal = 'Editando Pedido ' + pedido.cliente;
       this.isEditMode = true;
       this.selectedPedido = pedido;
+      // cargar productos seleccionados
+      this.productosSeleccionados = pedido.productos || [];
       this.pedidoForm.patchValue({
         id: pedido.id,
-        cliente: pedido.cliente,
-        listarProductos: pedido.listarProductos,
+        cliente: pedido.cliente.id,
+        productosIds: pedido.productos.map(p=> p.id),
         total: pedido.total,
         fechaCreacion: pedido.fechaCreacion,
         estado: pedido.estado
+      });
+    }
+
+    estaProductoSeleccionado(producto: ProductoResponse): boolean {
+      return this.productosSeleccionados.some(p => p.id === producto.id);
+    }
+
+    // Metodo para el manejo de productos:
+    productoSeleccionado(producto: ProductoResponse, event: any): void{
+      if(event.target.checked){
+        this.productosSeleccionados.push(producto);
+      }else{
+        this.productosSeleccionados = this.productosSeleccionados.filter(p =>  p.id !== producto.id);
+      }
+      this.actualizarTotal();
+    }
+
+    // Método para actualizar el total
+    actualizarTotal(): void{
+      const total = this.productosSeleccionados.reduce((sum, producto) => sum + producto.precio, 0);
+      this.pedidoForm.patchValue({
+        productos: this.productosSeleccionados.map(p=> p.id),
+        total: total
       });
     }
 

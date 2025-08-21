@@ -1,8 +1,8 @@
 export interface PedidoRequest{
-  id: number,
-  cliente: string,
-  listarProductos: number,
+  id?: number,
+  clienteId: number,
+  productosIds: number[],
   total: number,
-  fechaCreacion: Date,
+  fechaCreacion: string,
   estado: string,
 }

@@ -3,7 +3,7 @@
   <div class="d-flex justify-content-between mb-3">
     <button (click)="toggleForm()" class="btn btn-success">
       <i class="fa-solid fa-plus"></i>
-      Registrar Pedidos
+      {{ showForm ? 'Cancelar' : 'Registrar Pedidos' }}
     </button>
   </div>
 
@@ -12,7 +12,7 @@
       <tr style="text-align: center;">
         <th scope="col">#</th>
         <th scope="col">Cliente</th>
-        <th scope="col">Listar Productos</th>
+        <th scope="col">Productos</th>
         <th scope="col">Total</th>
         <th scope="col">Fecha Creación</th>
         <th scope="col">Estado</th>
@@ -23,11 +23,27 @@
       <tr *ngFor="let pedido of pedidos; let i = index" style="text-align: center; vertical-align: middle;">
         <td>{{ i + 1 }}</td>
         <td hidden>{{ pedido.id }}</td>
-        <td>{{ pedido.cliente }}</td>
-        <td>{{ pedido.listarProductos | currency }}</td>
-        <td>{{ pedido.total }}</td>
-        <td>{{ pedido.fechaCreacion }}</td>
-        <td>{{ pedido.estado }}</td>
+        <td>{{ pedido.cliente.nombre }} {{ pedido.cliente.apellido }} </td>
+        <td>
+          <ul class="list-unstyled mb-0">
+            <li *ngFor="let producto of pedido.productos" class="small">
+              {{ producto.nombre }} ({{ producto.precio | currency}})
+            </li>
+          </ul>
+        </td>
+        <td>{{ pedido.total | currency }}</td>
+        <td>{{ pedido.fechaCreacion | date:'dd/MM/yyyy' }}</td>
+        <td>
+          <span [ngClass]="{
+            'badge bg-warning': pedido.estado === 'PENDIENTE',
+            'badge bg-info': pedido.estado === 'ENVIADO',
+            'badge bg-success': pedido.estado === 'ENTREGADO',
+            'badge bg-danger': pedido.estado === 'CANCELADO',
+            'badge bg-primary': pedido.estado === 'PROCESANDO'
+          }" class="badge">
+            {{ pedido.estado }}
+          </span>
+        </td>
         <td *ngIf="muestraAcciones">
           <button class="btn btn-primary btn-sm me-1" (click)="editProducto(pedido)">
             <i class="fa fa-edit"></i> Editar
@@ -40,30 +56,105 @@
     </tbody>
   </table>
 
-  <div *ngIf="showForm" style="margin-top: 20px;">
-    <h3>{{ textoModal }}</h3>
-    <form [formGroup]="pedidoForm" (ngSubmit)="onSubmit()">
-      <input type="hidden" readonly formControlName="id">
+  <!-- Formulario de Pedidos -->
+  <div *ngIf="showForm" class="card mt-4">
+    <div class="card-header">
+      <h3 class="card-title mb-0">{{ textoModal }}</h3>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="pedidoForm" (ngSubmit)="onSubmit()">
+        <input type="hidden" formControlName="id">
 
-      <div class="form-group">
-        <label for="nombre">Nombre</label>
-        <input id="nombre" class="form-control" formControlName="nombre" maxlength="30">
-      </div>
-      <div class="form-group">
-        <label for="descripcion">Descripción</label>
-        <input id="descripcion" class="form-control" formControlName="descripcion" maxlength="50">
-      </div>
-      <div class="form-group">
-        <label for="precio">Precio</label>
-        <input id="precio" type="number" class="form-control" formControlName="precio" min="1">
-      </div>
-      <div class="form-group">
-        <label for="stock">Stock</label>
-        <input id="stock" type="number" class="form-control" formControlName="stock" min="1">
-      </div>
-      <button type="submit" class="btn btn-success" [disabled]="pedidoForm.invalid" style="margin-top: 20px;">
-        Guardar
-      </button>
-    </form>
+        <div class="row">
+          <!-- Selección de Cliente -->
+          <div class="col-md-6 mb-3">
+            <label for="clienteId" class="form-label">Cliente *</label>
+            <select id="clienteId" class="form-control" formControlName="clienteId"
+                    [class.is-invalid]="pedidoForm.get('clienteId')?.invalid && pedidoForm.get('clienteId')?.touched">
+              <option value="">Seleccionar cliente</option>
+              <option *ngFor="let cliente of clientes" [value]="cliente.id">
+                {{ cliente.nombre }} {{ cliente.apellido }}
+              </option>
+            </select>
+            <div *ngIf="pedidoForm.get('clienteId')?.invalid && pedidoForm.get('clienteId')?.touched"
+                 class="invalid-feedback">
+              Debe seleccionar un cliente
+            </div>
+          </div>
+
+          <!-- Estado del Pedido -->
+          <div class="col-md-6 mb-3">
+            <label for="estado" class="form-label">Estado *</label>
+            <select id="estado" class="form-control" formControlName="estado"
+                    [class.is-invalid]="pedidoForm.get('estado')?.invalid && pedidoForm.get('estado')?.touched">
+              <option *ngFor="let estado of estadosPedido" [value]="estado">
+                {{ estado }}
+              </option>
+            </select>
+            <div *ngIf="pedidoForm.get('estado')?.invalid && pedidoForm.get('estado')?.touched"
+                 class="invalid-feedback">
+              Debe seleccionar un estado
+            </div>
+          </div>
+        </div>
+
+        <!-- Selección de Productos -->
+        <div class="mb-3">
+          <label class="form-label">Productos *</label>
+          <div class="border p-3 rounded">
+            <div class="row">
+              <div *ngFor="let producto of productosIds" class="col-md-4 mb-2">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox"
+                         [id]="'producto-' + producto.id"
+                         [checked]="estaProductoSeleccionado(producto)"
+                         (change)="productoSeleccionado(producto, $event)">
+                  <label class="form-check-label" [for]="'producto-' + producto.id">
+                    {{ producto.nombre }} - {{ producto.precio | currency }}
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="pedidoForm.get('productoIds')?.invalid && pedidoForm.get('productoIds')?.touched"
+               class="text-danger small">
+            Debe seleccionar al menos un producto
+          </div>
+        </div>
+
+        <div class="row">
+          <!-- Total -->
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Total</label>
+            <div class="form-control-plaintext fw-bold">
+              {{ pedidoForm.get('total')?.value | currency }}
+            </div>
+          </div>
+
+          <!-- Fecha de Creación -->
+          <div class="col-md-6 mb-3">
+            <label for="fechaCreacion" class="form-label">Fecha Creación *</label>
+            <input type="date" class="form-control" formControlName="fechaCreacion"
+                   [class.is-invalid]="pedidoForm.get('fechaCreacion')?.invalid && pedidoForm.get('fechaCreacion')?.touched">
+            <div *ngIf="pedidoForm.get('fechaCreacion')?.invalid && pedidoForm.get('fechaCreacion')?.touched"
+                 class="invalid-feedback">
+              Fecha inválida
+            </div>
+          </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-success" [disabled]="pedidoForm.invalid">
+            <i class="fa-solid fa-save"></i>
+            {{ isEditMode ? 'Actualizar' : 'Crear' }} Pedido
+          </button>
+          <button type="button" class="btn btn-secondary" (click)="resetForm()">
+            <i class="fa-solid fa-times"></i>
+            Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
