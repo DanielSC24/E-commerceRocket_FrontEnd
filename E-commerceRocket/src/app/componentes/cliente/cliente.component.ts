@@ -52,10 +52,9 @@ export class ClienteComponent {
   //inicializa el componente
   ngOnInit(){
   this.listarClientes();
-  // Replace 'ADMIN_ROLE' with the actual value or enum used in your app for the admin role
-    if(this.authService.hasRole('ADMIN')) {
-      this.mostrarAcciones = true;
-    }
+  if(this.authService.hasRole('ROLE_ADMIN')) {
+    this.mostrarAcciones = true;
+  }
 }
 //lista de clientes
 listarClientes(): void{
@@ -119,6 +118,12 @@ editCliente(cliente: ClienteResponse): void {
     ...cliente
   })
 }
+ cancelar(): void {
+    this.showForm = false;
+    if (this.clienteForm) {
+      this.clienteForm.reset();
+    }
+  }
 
 //elimina un cliente
 deleteCliente(idCliente: number): void {

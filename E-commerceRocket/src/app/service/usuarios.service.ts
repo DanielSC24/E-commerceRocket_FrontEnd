@@ -14,18 +14,13 @@ import { environment } from '../environments/enviroments';
 })
 export class UsuariosService {
 
-  private apiUrl: string = environment.apiUrl;
+
+
+  private apiUrl: string = 'http://localhost:9000/admin/usuarios';
 
   constructor(private http: HttpClient) { }
 
-  getRoles(): Observable<string[]> {
-    return this.http.get<string[]>(`${this.apiUrl}/roles`).pipe(
-      catchError(error => {
-        console.error('Error al obtener los roles', error);
-        return of([]);
-      })
-    );
-  }
+  
 
   getUsuarios(): Observable<UsuarioResponse[]> {
     return this.http.get<UsuarioResponse[]>(this.apiUrl).pipe(
@@ -35,7 +30,10 @@ export class UsuariosService {
         return of([]);
       })
     );
-  }
+  } 
+   getRoles(): Observable<any[]> {
+  return this.http.get<any[]>(`${this.apiUrl}/roles`);
+}
 
   postUsuario(usuario: UsuarioRequest): Observable<UsuarioResponse> {
     return this.http.post<UsuarioResponse>(this.apiUrl, usuario).pipe(

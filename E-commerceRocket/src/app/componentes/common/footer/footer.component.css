@@ -3,6 +3,11 @@ footer {
   color: white;
   padding: 5px 0; /* Reducir padding vertical sin afectar el texto */
   text-align: center;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100vw;
+  z-index: 100;
 }
 
 footer .fab {

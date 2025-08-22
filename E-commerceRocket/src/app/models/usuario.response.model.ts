@@ -1,4 +1,4 @@
 export interface UsuarioResponse {
-    nombre_usuario: string;
-    idRol: number;
+    username: string;
+    roles: number;
 }

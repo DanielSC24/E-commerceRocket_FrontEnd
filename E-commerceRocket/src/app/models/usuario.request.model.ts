@@ -1,5 +1,5 @@
 export interface UsuarioRequest {
-    nombre_usuario: string;
-    contrasenia: string;
-    idRol: number;
+    username: string;
+    password: string;
+    roles: number;
 }
