@@ -15,14 +15,20 @@ export class LoginComponent {
 
   constructor(private router: Router, private authService: AuthService){}
 
+  ngOnInit(): void {
+    if (this.authService.isLoggedIn()) {
+      this.router.navigate(['/dashboard']);
+    }
+  }
+
   onLogin(){
     this.error=''; //limpiar errores previos
-    /*this.authService.login(this.username, this.password).subscribe({
+    this.authService.login(this.username, this.password).subscribe({
       next: () => this.router.navigate(['/dashboard']),
       error: () =>{
         this.error = 'Credenciales inválidas';
       }
-    });*/
+    });
 
   }
 
