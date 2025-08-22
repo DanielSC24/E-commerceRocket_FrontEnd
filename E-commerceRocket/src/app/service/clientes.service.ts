@@ -9,18 +9,18 @@ import { ClienteResponse } from '../models/cliente.response.model';
   providedIn: 'root'
 })
 export class ClientesService {
- private apiUrl: string = environment.apiUrl + '/clientes';
+ private clienteUrl: string = environment.clientes;
 
   constructor(private http: HttpClient) { }
 
   getClientes(): Observable<ClienteResponse[]> {
-    return this.http.get<ClienteResponse[]>(this.apiUrl);
+    return this.http.get<ClienteResponse[]>(this.clienteUrl);
   }
   getClienteById(id: number): Observable<ClienteResponse> {
-    return this.http.get<ClienteResponse>(`${this.apiUrl}/${id}`);
+    return this.http.get<ClienteResponse>(`${this.clienteUrl}/${id}`);
   }
   postCliente(cliente: ClienteRequest): Observable<ClienteResponse>{
-    return this.http.post<ClienteResponse>(this.apiUrl, cliente).pipe(
+    return this.http.post<ClienteResponse>(this.clienteUrl, cliente).pipe(
       catchError(error =>{
         console.error('Error :', error);
         return throwError(error);
@@ -29,7 +29,7 @@ export class ClientesService {
 
   }
   putCliente(cliente: ClienteRequest, ClienteId: number): Observable<ClienteResponse> {
-    return this.http.put<ClienteResponse>(`${this.apiUrl}/${ClienteId}`, cliente).pipe(
+    return this.http.put<ClienteResponse>(`${this.clienteUrl}/${ClienteId}`, cliente).pipe(
       catchError(error => {
         console.error('Error al actualizar cliente', error);
         return throwError(() => error);
@@ -37,7 +37,7 @@ export class ClientesService {
     ); 
   }
   deleteCliente(clienteId: number): Observable<ClienteResponse> {
-    return this.http.delete<ClienteResponse>(`${this.apiUrl}/${clienteId}`).pipe(
+    return this.http.delete<ClienteResponse>(`${this.clienteUrl}/${clienteId}`).pipe(
       catchError(error => {
         console.error('Error al eliminar cliente', error);
         return throwError(() => error);

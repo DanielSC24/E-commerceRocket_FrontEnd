@@ -1,3 +1,5 @@
+
+
 import { Injectable } from '@angular/core';
 import { environment } from '../environments/enviroments';
 import { HttpClient } from '@angular/common/http';
@@ -13,6 +15,15 @@ export class ProductosService {
   private apiUrl: string = environment.apiUrl + 'productos/';
 
   constructor(private http: HttpClient) { }
+
+  descontarStock(productoId: number, cantidad: number): Observable<ProductoResponse> {
+    return this.http.patch<ProductoResponse>(`${this.apiUrl}${productoId}/descontar-stock`, { cantidad }).pipe(
+      catchError(error => {
+        console.error('Error al descontar stock', error);
+        return throwError(() => error);
+      })
+    );
+  }
 
   getProductos(): Observable<ProductoResponse[]> {
     return this.http.get<ProductoResponse[]>(this.apiUrl).pipe(

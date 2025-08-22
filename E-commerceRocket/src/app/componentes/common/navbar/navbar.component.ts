@@ -9,12 +9,17 @@ import { AuthService } from '../../../service/auth.service';
 })
 export class NavbarComponent {
 
-   username: string | null = null;
+  constructor(private authService: AuthService) { }
 
-  constructor(private authService: AuthService) {}
+  ngOnInit(): void { }
 
-  ngOnInit(): void {
-    this.username = this.authService.getUsername();
+  get isAdmin(): boolean {
+    const roles = this.authService.getRoles();
+    return this.authService.hasRole('ROLE_ADMIN');
+  }
+  get username(): string | null {
+    const user = this.authService.getUsername();
+    return user;
   }
 
   logout(): void {

@@ -32,7 +32,7 @@
  </table>
     <div *ngIf="showForm" style="margin-top: 20px;">
         <h3>{{ textoModal }}</h3>
-        <form [formGroup]="clienteForm" (ngSubmit)="onSubmit()">
+    <form *ngIf="clienteForm" [formGroup]="clienteForm" (ngSubmit)="onSubmit()">
             <input type="hidden" readonly formControlName="id">
     
         <div class="form-group">

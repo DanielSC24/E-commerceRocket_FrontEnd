@@ -52,6 +52,7 @@ export class AuthService {
   setToken(token:string): void{
     if(isPlatformBrowser(this.platformId)){
       localStorage.setItem(this.tokenKey, token);
+      this.payload = null; // Forzar recarga del payload en el próximo getRoles
     }
   }
 
@@ -99,9 +100,15 @@ export class AuthService {
     return this.payload?.roles || [];
   }
 
-  hasRole(role: string): boolean {
-    return this.getRoles().includes(role);
-  }
+get isAdmin(): boolean {
+  const roles = this.getRoles();
+  console.log('Roles en navbar:', roles);
+  return this.hasRole('ROLE_ADMIN');
+}
+
+hasRole(role: string): boolean {
+  return this.getRoles().includes(role);
+}
 
   hasAnyRole(roles: string[]): boolean {
     return roles.some(r => this.getRoles().includes(r));

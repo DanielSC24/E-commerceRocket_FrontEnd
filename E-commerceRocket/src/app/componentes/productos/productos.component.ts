@@ -22,11 +22,11 @@ export class ProductosComponent {
   isEditMode: boolean = false;
   muestraAcciones: boolean = false;
 
-  constructor(private productosService: ProductosService, private formBuilder: FormBuilder){
+  constructor(private productosService: ProductosService, private formBuilder: FormBuilder) {
     this.productoForm = this.formBuilder.group({
       id: [null],
-      nombre: ['', [Validators.required, Validators.maxLength(30)] ],
-      descripcion: ['', [Validators.required, Validators.maxLength(150)] ],
+      nombre: ['', [Validators.required, Validators.maxLength(30)]],
+      descripcion: ['', [Validators.required, Validators.maxLength(150)]],
       precio: ['', [Validators.required, Validators.min(0)]],
       stock: ['', [Validators.required, Validators.min(0)]],
     });
@@ -39,13 +39,13 @@ export class ProductosComponent {
     // }
   }
 
-   listarProductos(): void {
-     this.productosService.getProductos().subscribe({
+  listarProductos(): void {
+    this.productosService.getProductos().subscribe({
       next: resp => {
-         this.productos = resp;
+        this.productos = resp;
       }
-     });
-    }
+    });
+  }
 
   toggleForm(): void {
     this.showForm = !this.showForm;
