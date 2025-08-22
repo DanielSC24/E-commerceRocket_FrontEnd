@@ -15,55 +15,55 @@ export class AuthService {
 
   constructor(private http: HttpClient, private router: Router, @Inject(PLATFORM_ID) private platformId: Object) { }
 
-  login(username: string, password: string){
-    return this.http.post<{token: string}>(this.autUrl, {username, password}).pipe(
-      tap(response =>{
+  login(username: string, password: string) {
+    return this.http.post<{ token: string }>(this.autUrl, { username, password }).pipe(
+      tap(response => {
         //localStorage.setItem(this.tokenKey, response.token);
         this.setToken(response.token);
       })
     );
   }
 
-  isLoggedIn(): boolean{
+  isLoggedIn(): boolean {
     const token = this.getToken();
     return !!token && !this.isTokenExpired();
   }
 
-  isTokenExpired(): boolean{
+  isTokenExpired(): boolean {
     const token = this.getToken();
-    if(!token) return true;
+    if (!token) return true;
 
-    try{
+    try {
       const payload = JSON.parse(atob(token.split('.')[1]));
-      const now = Math.floor(Date.now()/1000);
+      const now = Math.floor(Date.now() / 1000);
       return payload.exp < now;
-    }catch(e){
+    } catch (e) {
       return true;
     }
   }
 
-  getToken(): string | null{
-    if(isPlatformBrowser(this.platformId)){
+  getToken(): string | null {
+    if (isPlatformBrowser(this.platformId)) {
       return localStorage.getItem(this.tokenKey);
     }
     return null;
   }
 
-  setToken(token:string): void{
-    if(isPlatformBrowser(this.platformId)){
+  setToken(token: string): void {
+    if (isPlatformBrowser(this.platformId)) {
       localStorage.setItem(this.tokenKey, token);
-      this.payload = null; // Forzar recarga del payload en el próximo getRoles
+      this.payload = null;
     }
   }
 
-  logout(): void{
-    if(isPlatformBrowser(this.platformId)){
+  logout(): void {
+    if (isPlatformBrowser(this.platformId)) {
       localStorage.removeItem(this.tokenKey);
     }
     this.router.navigate(['/login']);
   }
 
-  isAuthenticated():boolean{
+  isAuthenticated(): boolean {
     return !!this.getToken();
   }
 
@@ -87,28 +87,28 @@ export class AuthService {
     if (!token) return null;
 
     try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        return payload.sub || null;
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.sub || null;
     } catch (e) {
-        console.error('Error leyendo username del token', e);
-        return null;
+      console.error('Error leyendo username del token', e);
+      return null;
     }
-}
+  }
 
   getRoles(): string[] {
     if (!this.payload) this.decodeToken();
     return this.payload?.roles || [];
   }
 
-get isAdmin(): boolean {
-  const roles = this.getRoles();
-  console.log('Roles en navbar:', roles);
-  return this.hasRole('ROLE_ADMIN');
-}
+  get isAdmin(): boolean {
+    const roles = this.getRoles();
+    console.log('Roles en navbar:', roles);
+    return this.hasRole('ROLE_ADMIN');
+  }
 
-hasRole(role: string): boolean {
-  return this.getRoles().includes(role);
-}
+  hasRole(role: string): boolean {
+    return this.getRoles().includes(role);
+  }
 
   hasAnyRole(roles: string[]): boolean {
     return roles.some(r => this.getRoles().includes(r));

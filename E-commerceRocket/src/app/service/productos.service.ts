@@ -12,7 +12,7 @@ import { ProductoRequest } from '../models/producto.request.model';
 })
 export class ProductosService {
 
-  private apiUrl: string = environment.apiUrl + 'productos/';
+  private apiUrl: string = environment.apiUrl + '/productos/';
 
   constructor(private http: HttpClient) { }
 

@@ -1,18 +1,19 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ProductoResponse } from '../../models/producto.response.model';
 import { ProductosService } from '../../service/productos.service';
 import { ProductoRequest } from '../../models/producto.request.model';
+import { AuthService } from '../../service/auth.service';
 import Swal from 'sweetalert2';
-
+import { Roles } from '../../models/roles.model';
 
 @Component({
   selector: 'app-productos',
   standalone: false,
   templateUrl: './productos.component.html',
-  styleUrl: './productos.component.css'
+  styleUrls: ['./productos.component.css']
 })
-export class ProductosComponent {
+export class ProductosComponent implements OnInit {
 
   productos: ProductoResponse[] = [];
   showForm: boolean = false;
@@ -22,7 +23,12 @@ export class ProductosComponent {
   isEditMode: boolean = false;
   muestraAcciones: boolean = false;
 
-  constructor(private productosService: ProductosService, private formBuilder: FormBuilder) {
+  // 🔹 inyectamos AuthService
+  constructor(
+    private productosService: ProductosService,
+    private formBuilder: FormBuilder,
+    private authService: AuthService
+  ) {
     this.productoForm = this.formBuilder.group({
       id: [null],
       nombre: ['', [Validators.required, Validators.maxLength(30)]],
@@ -34,9 +40,10 @@ export class ProductosComponent {
 
   ngOnInit() {
     this.listarProductos();
-    // if (this.authService.hasRole(Roles.ADMIN)) {
-    //   this.muestraAcciones = true;
-    // }
+
+    if (this.authService.hasRole(Roles.ADMIN)) {
+      this.muestraAcciones = true;
+    }
   }
 
   listarProductos(): void {
@@ -66,14 +73,12 @@ export class ProductosComponent {
   onSubmit(): void {
     if (this.productoForm.valid) {
       const productoData: ProductoRequest = this.productoForm.value;
-      console.log(productoData);
       if (this.isEditMode) {
         this.productosService.putProducto(productoData, productoData.id).subscribe({
           next: updatedProducto => {
             const index = this.productos.findIndex(p => p.id === updatedProducto.id);
-            if (index !== -1) {
-              this.productos[index] = updatedProducto;
-            }
+            if (index !== -1) this.productos[index] = updatedProducto;
+
             Swal.fire({
               title: 'Producto actualizado',
               text: 'El producto fue actualizado correctamente.',
@@ -134,5 +139,4 @@ export class ProductosComponent {
       }
     });
   }
-
 }

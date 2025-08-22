@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { Form } from '@angular/forms';
 import { AuthService } from '../../service/auth.service';
 import { UsuarioRequest } from '../../models/usuario.request.model';
 import Swal from 'sweetalert2';
@@ -20,18 +19,18 @@ export enum Roles {
   styleUrl: './usuarios.component.css'
 })
 export class UsuariosComponent {
-usuarios: UsuarioResponse[] = [];
-showForm: boolean = false;
-usuarioForm: FormGroup;
-textoModal: string = 'nuevo usuario';
-selectedUsuario: UsuarioResponse | null = null;
-isEditMode: boolean = false;
-muestraAcciones: boolean = false;
-roles: string[] = Object.values(Roles);
+  usuarios: UsuarioResponse[] = [];
+  showForm: boolean = false;
+  usuarioForm: FormGroup;
+  textoModal: string = 'nuevo usuario';
+  selectedUsuario: UsuarioResponse | null = null;
+  isEditMode: boolean = false;
+  muestraAcciones: boolean = false;
+  roles: string[] = Object.values(Roles);
 
 
-constructor(private usuariosService: UsuariosService, private authService: AuthService,
-  private formBuilder: FormBuilder){
+  constructor(private usuariosService: UsuariosService, private authService: AuthService,
+    private formBuilder: FormBuilder) {
     this.usuarioForm = formBuilder.group({
       nombre_usuario: ['', [Validators.required, Validators.maxLength(30)]],
       contrasenia: ['', [Validators.required, Validators.minLength(8)]],
@@ -39,18 +38,18 @@ constructor(private usuariosService: UsuariosService, private authService: AuthS
     });
   }
 
-  
-    //Se ejecuta al inicializar el componente
-   
+
+  //Se ejecuta al inicializar el componente
+
   ngOnInit() {
     this.listarUsuarios();
-    if(this.authService.hasRole(Roles.ADMIN)){ 
+    if (this.authService.hasRole(Roles.ADMIN)) {
       this.muestraAcciones = true;
     }
   }
-//lista de usuarios
+  //lista de usuarios
   listarUsuarios(): void {
-    this .usuariosService.getUsuarios().subscribe({
+    this.usuariosService.getUsuarios().subscribe({
       next: resp => {
         this.usuarios = resp;
       }
@@ -61,10 +60,10 @@ constructor(private usuariosService: UsuariosService, private authService: AuthS
     switch (rol) {
       case Roles.ADMIN:
         return 'Administrador';
-        case Roles.USER:
-          return 'Usuario';
-          default:
-            return 'Desconocido';
+      case Roles.USER:
+        return 'Usuario';
+      default:
+        return 'Desconocido';
     }
   }
   //se ejecuta al alternar el formulario
@@ -92,7 +91,7 @@ constructor(private usuariosService: UsuariosService, private authService: AuthS
           next: updateUsuario => {
             // Actualiza el usuario en la lista
             const index = this.usuarios.findIndex(u => u.nombre_usuario === usuarioData.nombre_usuario);
-            if(index !== -1) {
+            if (index !== -1) {
               this.usuarios[index] = updateUsuario;
             }
             Swal.fire({
@@ -103,7 +102,7 @@ constructor(private usuariosService: UsuariosService, private authService: AuthS
             this.resetForm();
           }
         });
-      }else {
+      } else {
         //crea un nuevo usuario
         this.usuariosService.postUsuario(usuarioData).subscribe({
           next: newUsuario => {
@@ -118,15 +117,15 @@ constructor(private usuariosService: UsuariosService, private authService: AuthS
     }
   }
   //se ejecuta al editar un usuario
-    editUsuario(usuario: UsuarioResponse): void {
-      this.showForm = true;
-      this.textoModal = 'Editando Usuario ' + usuario.nombre_usuario;
-      this.isEditMode = true;
-      this.selectedUsuario = usuario;
-      this.usuarioForm.patchValue({
-        ...usuario
-      });
-    
+  editUsuario(usuario: UsuarioResponse): void {
+    this.showForm = true;
+    this.textoModal = 'Editando Usuario ' + usuario.nombre_usuario;
+    this.isEditMode = true;
+    this.selectedUsuario = usuario;
+    this.usuarioForm.patchValue({
+      ...usuario
+    });
+
   }
   //elimina un usuario
   deleteUsuario(nombre_usuario: string): void {
@@ -137,7 +136,7 @@ constructor(private usuariosService: UsuariosService, private authService: AuthS
       showConfirmButton: true,
       showCancelButton: true
     }).then(resp => {
-      if(resp.isConfirmed) {
+      if (resp.isConfirmed) {
         this.usuariosService.deleteUsuario(nombre_usuario).subscribe({
           next: deleteUsuario => {
             this.usuarios = this.usuarios.filter(u => u.nombre_usuario !== nombre_usuario);
