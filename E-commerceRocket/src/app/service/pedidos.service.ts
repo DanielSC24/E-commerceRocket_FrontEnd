@@ -14,41 +14,50 @@ export class PedidosService {
 
   constructor(private http: HttpClient) { }
 
+  /** Listar pedidos */
   getPedido(): Observable<PedidoResponse[]> {
     return this.http.get<PedidoResponse[]>(this.apiUrl).pipe(
-      map(pedidos => pedidos.sort()),
+      map(pedidos => pedidos.sort((a, b) => a.id - b.id)), // ordenar por id
       catchError(error => {
-        console.error('Error al obtener los productos', error);
+        console.error('Error al obtener los pedidos', error);
         return of([]);
       })
     );
   }
 
+  /** Crear nuevo pedido */
   postPedido(pedido: PedidoRequest): Observable<PedidoResponse> {
     return this.http.post<PedidoResponse>(this.apiUrl, pedido).pipe(
       catchError(error => {
-        console.error('Error al registrar el producto', error);
+        console.error('Error al registrar el pedido', error);
         return throwError(() => error);
       })
     );
   }
 
+  /** Actualizar pedido completo (solo para admin si es necesario) */
   putPedido(pedido: PedidoRequest, pedidoId: number): Observable<PedidoResponse> {
     return this.http.put<PedidoResponse>(`${this.apiUrl}${pedidoId}`, pedido).pipe(
       catchError(error => {
-        console.error('Error al actualizar el producto', error);
+        console.error('Error al actualizar el pedido', error);
         return throwError(() => error);
       })
     );
   }
 
-  deletePedido(pedidoId: number): Observable<PedidoResponse> {
-    return this.http.delete<PedidoResponse>(`${this.apiUrl}${pedidoId}`).pipe(
+  /** Actualizar solo el estado (PATCH) */
+  patchPedido(pedidoId: number, patchData: Partial<{ estado: string }>): Observable<PedidoResponse> {
+    return this.http.patch<PedidoResponse>(`${this.apiUrl}${pedidoId}`, patchData).pipe(
       catchError(error => {
-        console.error('Error al eliminar el producto', error);
+        console.error('Error al actualizar el estado del pedido', error);
         return throwError(() => error);
       })
     );
+  }
+
+  /** Eliminación lógica: cambiar estado a CANCELADO */
+  cancelPedido(pedidoId: number): Observable<PedidoResponse> {
+    return this.patchPedido(pedidoId, { estado: 'CANCELADO' });
   }
 
 }
