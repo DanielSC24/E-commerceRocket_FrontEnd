@@ -9,21 +9,21 @@ import { AuthService } from '../../../service/auth.service';
 })
 export class NavbarComponent {
 
-  constructor(private authService: AuthService) { }
+  constructor(private authService: AuthService) {}
 
-  ngOnInit(): void { }
+  ngOnInit(): void {}
 
-  get isAdmin(): boolean {
-    const roles = this.authService.getRoles();
-    return this.authService.hasRole('ROLE_ADMIN');
-  }
-  get username(): string | null {
-    const user = this.authService.getUsername();
-    return user;
-  }
+ get isAdmin(): boolean {
+  const roles = this.authService.getRoles();
+  return this.authService.hasRole('ROLE_ADMIN');
+}
+get username(): string | null {
+  const user = this.authService.getUsername();
+  return user;
+}
 
   logout(): void {
     this.authService.logout();
-  }
+  } 
 
 }

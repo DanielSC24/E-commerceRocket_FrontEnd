@@ -116,6 +116,12 @@ export class ProductosComponent implements OnInit {
       stock: producto.stock
     });
   }
+  cambiarCantidad(delta: number) {
+  const control = this.productoForm.get('cantidad');
+  let value = control?.value || 1;
+  value = Math.max(1, value + delta);
+  control?.setValue(value);
+}
 
   deleteProducto(idProducto: number): void {
     Swal.fire({

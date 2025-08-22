@@ -41,7 +41,7 @@ export class PedidosComponent implements OnInit {
     this.pedidoForm = this.formBuilder.group({
       id: [null],
       clienteId: ['', Validators.required],
-      productosIds: [[], Validators.required], // IDs de productos
+      productos: [[], Validators.required], // IDs de productos
       total: [{ value: 0, disabled: true }, [Validators.required, Validators.min(0)]], // deshabilitado correctamente
       fechaCreacion: [new Date().toISOString().split('T')[0], Validators.required],
       estado: ['PENDIENTE', Validators.required]
@@ -69,7 +69,7 @@ export class PedidosComponent implements OnInit {
   }
 
   listarProductos(): void {
-    this.productosService.getProductos().subscribe(resp => this.productosIds = resp);
+  this.productosService.getProductos().subscribe(resp => this.productosIds = resp);
   }
 
   toggleForm(): void {
@@ -79,7 +79,8 @@ export class PedidosComponent implements OnInit {
     this.productosSeleccionados = [];
     this.pedidoForm.reset({
       fechaCreacion: new Date().toISOString().split('T')[0],
-      estado: 'PENDIENTE'
+      estado: 'PENDIENTE',
+      productos: []
     });
     this.selectedPedido = null;
   }
@@ -90,7 +91,8 @@ export class PedidosComponent implements OnInit {
     this.productosSeleccionados = [];
     this.pedidoForm.reset({
       fechaCreacion: new Date().toISOString().split('T')[0],
-      estado: 'PENDIENTE'
+      estado: 'PENDIENTE',
+      productos: []
     });
     this.selectedPedido = null;
   }
@@ -101,6 +103,10 @@ export class PedidosComponent implements OnInit {
 
   productoSeleccionado(producto: ProductoResponse, event: any): void {
     if (event.target.checked) {
+      // Si el producto no tiene cantidad, inicializarla en 1
+      if (producto.cantidad === undefined) {
+        (producto as any).cantidad = 1;
+      }
       this.productosSeleccionados.push(producto);
     } else {
       this.productosSeleccionados = this.productosSeleccionados.filter(p => p.id !== producto.id);
@@ -108,16 +114,30 @@ export class PedidosComponent implements OnInit {
 
     // Actualizamos IDs de productos en el FormGroup
     this.pedidoForm.patchValue({
-      productosIds: this.productosSeleccionados.map(p => p.id)
+      productos: this.productosSeleccionados.map(p => p.id)
     });
 
-    // Actualizamos total
-    const total = this.productosSeleccionados.reduce((sum, p) => sum + p.precio, 0);
-    this.pedidoForm.get('total')?.setValue(total); // setValue respeta disabled
+    this.actualizarTotal();
+  }
+
+  actualizarCantidad(producto: any): void {
+    if (producto.cantidad < 1) {
+      producto.cantidad = 1;
+    }
+    this.actualizarTotal();
+  }
+
+  actualizarTotal(): void {
+    const total = this.productosSeleccionados.reduce((sum, p) => sum + (p.precio * (p.cantidad || 1)), 0);
+    this.pedidoForm.get('total')?.setValue(total);
   }
 
 
   onSubmit(): void {
+    // Si no hay productos seleccionados, marcar el campo como tocado para mostrar el error
+    if (!this.pedidoForm.get('productos')?.value || this.pedidoForm.get('productos')?.value.length === 0) {
+      this.pedidoForm.get('productos')?.markAsTouched();
+    }
     if (!this.pedidoForm.valid) return;
 
     // Validar stock
@@ -127,17 +147,18 @@ export class PedidosComponent implements OnInit {
       return;
     }
 
-    const formValue = this.pedidoForm.value;
-    const pedidoData: PedidoRequest = {
-      id: formValue.id,
-      clienteId: formValue.clienteId,
-      productos: this.productosSeleccionados.map(p => p.id),
-      total: formValue.total,
-      fechaCreacion: formValue.fechaCreacion,
-      estado: formValue.estado
-    };
+  const formValue = this.pedidoForm.getRawValue();
+      const pedidoData: any = {
+        id: formValue.id,
+        clienteId: Number(formValue.clienteId),
+        productos: this.productosSeleccionados.map(p => ({ productoId: Number(p.id), cantidad: p.cantidad || 1 })),
+        total: formValue.total,
+        fechaCreacion: formValue.fechaCreacion,
+        estado: formValue.estado
+      };
 
-    if (this.isEditMode) {
+  console.log('Pedido enviado:', pedidoData);
+  if (this.isEditMode) {
       // Solo se permite cambiar estado
       this.pedidosService.putPedido(pedidoData, pedidoData.id!).subscribe(updatePedido => {
         const index = this.pedidos.findIndex(p => p.id === updatePedido.id);
@@ -162,11 +183,15 @@ export class PedidosComponent implements OnInit {
     this.textoModal = 'Editando Pedido ' + pedido.cliente.nombre;
     this.isEditMode = true;
     this.selectedPedido = pedido;
-    this.productosSeleccionados = pedido.productos || [];
+    // Reconstruir productosSeleccionados y agregar cantidad: 1 a cada producto
+    this.productosSeleccionados = (pedido.productos || []).map(p => ({
+      ...p,
+      cantidad: 1
+    }));
     this.pedidoForm.patchValue({
       id: pedido.id,
       clienteId: pedido.cliente.id,
-      productosIds: pedido.productos.map(p => p.id),
+      productos: this.productosSeleccionados.map(p => p.id),
       total: pedido.total,
       fechaCreacion: pedido.fechaCreacion,
       estado: pedido.estado

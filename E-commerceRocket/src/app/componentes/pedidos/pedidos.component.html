@@ -114,10 +114,15 @@
                     {{ producto.nombre }} - {{ producto.precio | currency }}
                   </label>
                 </div>
+                <div *ngIf="estaProductoSeleccionado(producto)" class="mt-1 ms-4">
+                  <label class="form-label small mb-0">Cantidad:</label>
+                  <input type="number" min="1" class="form-control form-control-sm d-inline-block w-auto ms-1" style="width: 70px;"
+                    [(ngModel)]="producto.cantidad" (ngModelChange)="actualizarCantidad(producto)" [name]="'cantidad_' + producto.id">
+                </div>
               </div>
             </div>
           </div>
-          <div *ngIf="pedidoForm.get('productosIds')?.invalid && pedidoForm.get('productosIds')?.touched"
+          <div *ngIf="pedidoForm.get('productos')?.invalid && pedidoForm.get('productos')?.touched"
             class="text-danger small">
             Debe seleccionar al menos un producto
           </div>
